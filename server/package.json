@@ -5,8 +5,6 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "nodemon --no-deprecation src/index.js",
-    "build": "npm install",
     "test": "echo 'No tests specified' && exit 0"
   },
   "dependencies": {
