@@ -1,0 +1,34 @@
+{
+  "name": "doraemon-chat-bot",
+  "version": "1.0.0",
+  "description": "AI-Powered Personalized Learning Platform with Doraemon Chat Bot",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "doraemon",
+    "chatbot",
+    "ai",
+    "learning",
+    "education",
+    "react",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "Dhruv Malviya",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+} 
