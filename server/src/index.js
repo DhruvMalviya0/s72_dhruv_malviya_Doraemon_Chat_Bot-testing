@@ -19,7 +19,11 @@ app.use(cors({
   origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+<<<<<<< HEAD
   allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
+=======
+  allowedHeaders: ['Content-Type', 'Authorization']
+>>>>>>> 575dc7335d0bf20c95265587804d95fa7eb72014
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -30,6 +34,7 @@ app.use(passport.initialize());
 // Root API health check
 app.get('/', (req, res) => {
   res.json({
+<<<<<<< HEAD
     message: 'Doraemon Chat Bot API',
     status: 'running',
     frontend: 'https://s72-dhruv-malviya-doraemon-chat-bot.vercel.app',
@@ -49,6 +54,11 @@ app.get('/health', (req, res) => {
     status: 'healthy', 
     timestamp: new Date().toISOString(),
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+=======
+    message: 'Doraemon Chat Bot API is running',
+    status: 'healthy',
+    frontend: 'https://s72-dhruv-malviya-doraemon-chat-bot.vercel.app'
+>>>>>>> 575dc7335d0bf20c95265587804d95fa7eb72014
   });
 });
 
