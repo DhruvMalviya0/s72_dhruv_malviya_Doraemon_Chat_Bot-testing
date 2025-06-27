@@ -11,39 +11,14 @@ const Login = ({ setUser }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check for token in URL when redirected from Google OAuth
+  // Check for error in URL parameters
   useEffect(() => {
     const params = new URLSearchParams(location.search);
-    const token = params.get('token');
-    
-    if (token && location.pathname === '/auth/google/success') {
-      localStorage.setItem('token', token);
-      handleGoogleLoginSuccess(token);
-    }
-    
-    // Check for error
     const error = params.get('error');
     if (error) {
       setError('Google authentication failed. Please try again.');
     }
   }, [location]);
-
-  const handleGoogleLoginSuccess = async (token) => {
-    try {
-      // Get user info using the token
-      const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/api/auth/google/success`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Error fetching user info:', error);
-      setError('Failed to get user information. Please try again.');
-    }
-  };
 
   const handleChange = (e) => {
     setFormData({

@@ -130,7 +130,7 @@ router.get('/google/callback',
     console.log('Received callback from Google OAuth');
     passport.authenticate('google', { 
       session: false, 
-      failureRedirect: `${process.env.CLIENT_URL}/login?error=auth_failed` 
+      failureRedirect: 'https://s72-dhruv-malviya-doraemon-chat-bot.vercel.app/login?error=auth_failed' 
     })(req, res, next);
   },
   (req, res) => {
@@ -141,41 +141,14 @@ router.get('/google/callback',
         expiresIn: '7d'
       });
       
-      // Redirect to client with token
-      res.redirect(`${process.env.CLIENT_URL}/auth/google/success?token=${token}`);
+      // Redirect to frontend dashboard with token
+      res.redirect(`https://s72-dhruv-malviya-doraemon-chat-bot.vercel.app/dashboard?token=${token}&auth=success`);
     } catch (error) {
       console.error('Google auth callback error:', error);
-      res.redirect(`${process.env.CLIENT_URL}/login?error=${encodeURIComponent(error.message || 'authentication_failed')}`);
+      res.redirect(`https://s72-dhruv-malviya-doraemon-chat-bot.vercel.app/login?error=${encodeURIComponent(error.message || 'authentication_failed')}`);
     }
   }
 );
-
-// Check Google auth status and return user info
-router.get('/google/success', auth, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.userId).select('-password');
-    
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    
-    res.json({
-      user: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        profile: user.profile,
-        xp: user.xp,
-        level: user.level,
-        badges: user.badges,
-        googleId: !!user.googleId // Just return boolean indicating if connected
-      }
-    });
-  } catch (error) {
-    console.error('Google auth success error:', error);
-    res.status(500).json({ message: 'Error fetching user data' });
-  }
-});
 
 // Get user profile
 router.get('/profile', auth, async (req, res) => {

@@ -16,12 +16,10 @@ const allowedOrigins = [
   'http://localhost:3000'
 ];
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('Not allowed by CORS: ' + origin));
-  },
-  credentials: true
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -29,12 +27,28 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Initialize passport
 app.use(passport.initialize());
 
+// Root API health check
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Doraemon Chat Bot API',
+    status: 'running',
+    frontend: 'https://s72-dhruv-malviya-doraemon-chat-bot.vercel.app',
+    endpoints: {
+      auth: '/api/auth/google',
+      chat: '/api/chat',
+      quiz: '/api/quiz',
+      progress: '/api/progress',
+      leaderboard: '/api/leaderboard'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
+  res.json({ 
+    status: 'healthy', 
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
 
@@ -99,11 +113,6 @@ app.use((err, req, res, next) => {
     message: 'Internal server error',
     error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
-});
-
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
 });
 
 // Create HTTP server and bind Socket.io

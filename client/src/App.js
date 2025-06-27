@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import axios from 'axios';
 import ChatInterface from './components/ChatInterface';
 import Quiz from './components/Quiz';
 import LevelProgress from './components/LevelProgress';
@@ -60,6 +61,42 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Check for OAuth callback token in URL
+    const handleOAuthCallback = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const authStatus = urlParams.get('auth');
+      
+      if (token && authStatus === 'success') {
+        try {
+          console.log('OAuth callback detected, processing token...');
+          
+          // Store the token
+          localStorage.setItem('token', token);
+          
+          // Get user info using the token
+          const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/api/auth/profile`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          
+          // Store user data
+          localStorage.setItem('user', JSON.stringify(response.data));
+          setUser(response.data);
+          
+          // Clean up URL parameters
+          window.history.replaceState({}, document.title, '/dashboard');
+          
+          console.log('OAuth authentication successful');
+        } catch (error) {
+          console.error('Error processing OAuth callback:', error);
+          // Clean up URL parameters on error
+          window.history.replaceState({}, document.title, '/login?error=auth_failed');
+        }
+      }
+    };
+
     // Check if user token is valid on app load
     const checkAuthStatus = async () => {
       const token = localStorage.getItem('token');
@@ -77,7 +114,10 @@ function App() {
       }
     };
 
-    checkAuthStatus();
+    // Handle OAuth callback first, then check auth status
+    handleOAuthCallback().then(() => {
+      checkAuthStatus();
+    });
   }, [user]);
 
   const handleLogout = () => {
@@ -154,7 +194,6 @@ function App() {
             <Route path="/quiz" element={user ? <Quiz /> : <Navigate to="/login" />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/dashboard" element={user ? <ChatInterface /> : <Navigate to="/login" />} />
-            <Route path="/auth/google/success" element={<Login setUser={setUser} />} />
             <Route path="/" element={<Navigate to="/dashboard" />} />
           </Routes>
         </main>
